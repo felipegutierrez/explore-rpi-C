@@ -28,7 +28,7 @@ void *aThread(void*) {
 }
 
 int main(int argv, char** argc) {
-	std::cout << "Hello World!" << std::endl;
+	std::cout << "Hello World MultiThread!" << std::endl;
 	int rc1, rc2, rc3;
 	pthread_t thread1, thread2, thread3;
 
