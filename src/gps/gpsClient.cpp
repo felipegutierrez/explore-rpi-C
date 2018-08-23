@@ -17,17 +17,27 @@
 int main(int argv, char** argc) {
 	int rc;
 	struct timeval tv;
+	clock_t t;
 
 	struct gps_data_t gps_data;
+	t = clock();
 	if ((rc = gps_open("localhost", "2947", &gps_data)) == -1) {
 		printf("code: %d, reason: %s\n", rc, gps_errstr(rc));
 		return EXIT_FAILURE;
 	}
+	t = clock() - t;
+	double time_taken = ((double) t) / CLOCKS_PER_SEC; // in seconds
+	printf("gps_open() took %f seconds to execute \n", time_taken);
+
+	t = clock();
 	gps_stream(&gps_data, WATCH_ENABLE | WATCH_JSON, NULL);
+	t = clock() - t;
+	time_taken = ((double) t) / CLOCKS_PER_SEC; // in seconds
+	printf("gps_stream() took %f seconds to execute \n", time_taken);
 
 	while (true) {
-		/* wait for 2 seconds to receive data */
-		if (gps_waiting(&gps_data, 2000000)) {
+		/* wait for 1 second to receive data */
+		if (gps_waiting(&gps_data, 1000000)) {
 			/* read data */
 			if ((rc = gps_read(&gps_data)) == -1) {
 				printf("error occured reading gps data. code: %d, reason: %s\n",
@@ -68,8 +78,10 @@ int main(int argv, char** argc) {
 					printf(" =( NO GPS data received\n");
 				}
 			}
+		} else {
+			printf("Timeout to retrieve data from gpsd.");
 		}
-		sleep(3);
+		// sleep(3);
 	}
 
 	/* When you are done... */
