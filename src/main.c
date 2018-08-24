@@ -1,6 +1,9 @@
 /*
  * main.c
  *
+ * Compiling on Debian
+ * gcc main.c multithread/testMultiThread.c gps/gpsClient.c -Wall -Wcomment -lm -lgps -lpthread -o main
+ *
  *  Created on: Aug 24, 2018
  *      Author: felipe
  */
@@ -8,6 +11,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "main.h"
 #include "multithread/testMultiThread.h"
 #include "gps/gpsClient.h"
 
@@ -40,11 +44,11 @@ int main(int argv, char** argc) {
 	}
 
 	printf("Exit\n");
-	exit(EXIT_SUCCESS);
+	exit(0);
 	return 0;
 }
 
-menu() {
+void menu() {
 	printf(" 0  - Exit\n");
 	printf(" 1  - MultiThread test\n");
 	printf(" 2  - Gps test\n");

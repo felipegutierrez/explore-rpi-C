@@ -57,10 +57,10 @@ int runGpsClient() {
 				int mode = gps_data.fix.mode;
 
 				/**
-				 * MODE_NOT_SEEN	0	/* mode update not seen yet
-				 * MODE_NO_FIX		1	/* none
-				 * MODE_2D  		2	/* good for latitude/longitude
-				 * MODE_3D  		3	/* good for altitude/climb too
+				 * MODE_NOT_SEEN	0	mode update not seen yet
+				 * MODE_NO_FIX		1	none
+				 * MODE_2D  		2	good for latitude/longitude
+				 * MODE_3D  		3	good for altitude/climb too
 				 */
 				printf("status: %d - ", status);
 				printf("mode: %d - ", mode);
