@@ -1,5 +1,5 @@
 /*
- * gpsClient.cpp
+ * gpsClient.c
  *
  * command line to compile the source code
  * # gcc -o gpsClient gpsClient.cpp -lm -lgps
@@ -14,8 +14,11 @@
 #include <unistd.h>
 #include <math.h>
 
-int main(int argv, char** argc) {
+#include "gpsClient.h"
+
+int runGpsClient() {
 	int rc;
+	int count = 0;
 	struct timeval tv;
 	clock_t t;
 
@@ -35,7 +38,7 @@ int main(int argv, char** argc) {
 	time_taken = ((double) t) / CLOCKS_PER_SEC; // in seconds
 	printf("gps_stream() took %f seconds to execute \n", time_taken);
 
-	while (true) {
+	while (count < 60) {
 		/* wait for 1 second to receive data */
 		if (gps_waiting(&gps_data, 1000000)) {
 			/* read data */
@@ -82,6 +85,7 @@ int main(int argv, char** argc) {
 			printf("Timeout to retrieve data from gpsd.");
 		}
 		// sleep(3);
+		count++;
 	}
 
 	/* When you are done... */
