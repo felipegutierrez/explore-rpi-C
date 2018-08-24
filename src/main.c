@@ -35,7 +35,12 @@ int main(int argv, char** argc) {
 			break;
 		case 2:
 			printf("\n");
-			runGpsClient();
+			runGpsStreamClient();
+			choice = 0;
+			break;
+		case 3:
+			printf("\n");
+			runGpsCommanClient();
 			choice = 0;
 			break;
 		default:
@@ -51,6 +56,7 @@ int main(int argv, char** argc) {
 void menu() {
 	printf(" 0  - Exit\n");
 	printf(" 1  - MultiThread test\n");
-	printf(" 2  - Gps test\n");
+	printf(" 2  - Gps stream test\n");
+	printf(" 3  - Gps command test\n");
 	printf("Please choose your application: ");
 }

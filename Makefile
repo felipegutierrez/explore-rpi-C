@@ -10,7 +10,8 @@ all: clean compile
 	$(CC) -c $(CCFLAGS) $<
 
 compile:
+	mkdir $(TARGET)
 	$(CC) $(SRC)/main.c $(SRC)/multithread/testMultiThread.c $(SRC)/gps/gpsClient.c $(CCFLAGS) -o $(TARGET)/main
 
 clean:
-	rm -Rf $(TARGET)/*
+	rm -Rf $(TARGET)

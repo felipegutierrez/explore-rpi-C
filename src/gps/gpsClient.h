@@ -9,7 +9,8 @@
 #define GPS_GPSCLIENT_H_
 
 
-int runGpsClient();
+int runGpsStreamClient();
+int runGpsCommanClient();
 
 
 #endif /* GPS_GPSCLIENT_H_ */
