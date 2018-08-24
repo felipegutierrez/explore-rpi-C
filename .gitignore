@@ -31,3 +31,12 @@
 *.out
 *.app
 
+# hide files and folders
+.cproject
+.project
+.settings
+
+# Target files and folders
+Debug
+cli
+
