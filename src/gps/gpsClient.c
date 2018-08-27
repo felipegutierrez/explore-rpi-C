@@ -42,8 +42,13 @@ int runGpsStreamClient() {
 	get_user_time(user_t, "gps_stream");
 
 	while (count < 60) {
-		/* wait for 0.1 second to receive data */
-		if (gps_waiting(&gps_data, 100000)) {
+
+		gettimeofday(&user_t, NULL);
+		cpu_t = clock();
+		/* wait for 2 second to receive data */
+		if (gps_waiting(&gps_data, 20000000)) {
+			get_cpu_time(cpu_t, "gps_waiting");
+			get_user_time(user_t, "gps_waiting");
 
 			gettimeofday(&user_t, NULL);
 			cpu_t = clock();
@@ -91,6 +96,8 @@ int runGpsStreamClient() {
 				}
 			}
 		} else {
+			get_cpu_time(cpu_t, "gps_waiting");
+			get_user_time(user_t, "gps_waiting");
 			printf(
 					"counter[%d]. Timeout to retrieve data from gpsd. Maybe increase gps_waiting.\n",
 					count);
