@@ -102,7 +102,8 @@ int runGpsCommanClient() {
 //	char *fmsg = "?WATCH={\"nmea\":true,\"pps\":true}\r\n";
 //	char *fmsg = "?WATCH={\"raw\":2,\"pps\":true}\r\n";
 //	char *fmsg = "?WATCH={\"nmea\":true,\"pps\":true,\"device\":\"/dev/serial0\"}\r\n";
-	char *fmsg = "?WATCH={\"raw\":2,\"pps\":true,\"device\":\"/dev/serial0\"}\r\n";
+//	char *fmsg = "?WATCH={\"raw\":2,\"pps\":true,\"device\":\"/dev/serial0\"}\r\n";
+	char *fmsg = "?WATCH={\"enable\":true,\"pps\":true}\r\n";
 	struct gps_data_t gps_data;
 
 	if ((rc = gps_open("localhost", "2947", &gps_data)) == -1) {
