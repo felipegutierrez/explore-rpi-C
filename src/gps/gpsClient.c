@@ -16,6 +16,7 @@
 #include <math.h>
 
 #include "gpsClient.h"
+#include "../utils/metrics.h"
 
 int runGpsStreamClient() {
 	int rc;
@@ -28,21 +29,22 @@ int runGpsStreamClient() {
 		printf("code: %d, reason: %s\n", rc, gps_errstr(rc));
 		return EXIT_FAILURE;
 	}
-	t = clock() - t;
-	double time_taken = ((double) t) / CLOCKS_PER_SEC; // in seconds
-	printf("gps_open() took %f seconds to execute \n", time_taken);
+	get_metric(t, "gps_open");
 
 	t = clock();
 	gps_stream(&gps_data, WATCH_ENABLE | WATCH_JSON, NULL);
-	t = clock() - t;
-	time_taken = ((double) t) / CLOCKS_PER_SEC; // in seconds
-	printf("gps_stream() took %f seconds to execute \n", time_taken);
+	get_metric(t, "gps_stream");
 
 	while (count < 60) {
-		/* wait for 1 second to receive data */
-		if (gps_waiting(&gps_data, 1000000)) {
+		/* wait for 0.1 second to receive data */
+		if (gps_waiting(&gps_data, 100000)) {
+
+			t = clock();
+			int rc = gps_read(&gps_data);
+			get_metric(t, "gps_read");
+
 			/* read data */
-			if ((rc = gps_read(&gps_data)) == -1) {
+			if (rc == -1) {
 				printf(
 						"error occurred reading gps data. code: %d, reason: %s\n",
 						rc, gps_errstr(rc));
@@ -53,7 +55,7 @@ int runGpsStreamClient() {
 				double alt = gps_data.fix.altitude;
 				double speed = gps_data.fix.speed;
 				double climb = gps_data.fix.climb;
-				double t = gps_data.fix.time; // EDIT: Replaced tv.tv_sec with gps_data.fix.time
+				time_t seconds = (time_t) gps_data.fix.time;
 				int status = gps_data.status;
 				int mode = gps_data.fix.mode;
 
@@ -63,30 +65,28 @@ int runGpsStreamClient() {
 				 * MODE_2D  		2	good for latitude/longitude
 				 * MODE_3D  		3	good for altitude/climb too
 				 */
-				printf("status: %d - ", status);
-				printf("mode: %d - ", mode);
-				printf("latitude: %f - ", lat);
-				printf("longitude: %f - ", lon);
-				printf("altitude: %f - ", alt);
-				printf("speed: %f - ", speed);
-				printf("vertical speed: %f - ", climb);
-				printf("timestamp: %f - ", t);
-				printf("%d:%d:%d", (int) (t / 3600), (int) (t / 60), (int) t);
+				printf("status[%d], ", status);
+				printf("mode[%d], ", mode);
+				printf("latitude[%f], ", lat);
+				printf("longitude[%f], ", lon);
+				printf("altitude[%f], ", alt);
+				printf("speed[%f], ", speed);
+				printf("v speed[%f], ", climb);
+				printf("Time[%s].", ctime(&seconds));
 
 				if ((status == STATUS_FIX)
 						&& (mode == MODE_2D || mode == MODE_3D)
 						&& !isnan(lat) && !isnan(lon)) {
-					//gettimeofday(&tv, NULL); EDIT: tv.tv_sec isn't actually the timestamp!
-					printf(" =) GPS data correctly received\n");
+					printf(" GPS data OK.\n");
 				} else {
-					printf(" =( NO GPS data received\n");
+					printf(" GPS data NOK.\n");
 				}
 			}
 		} else {
-			printf("Timeout to retrieve data from gpsd.");
+			printf("counter[%d]. Timeout to retrieve data from gpsd. Maybe increase gps_waiting.\n", count);
 		}
 		count++;
-		sleep(1);
+		// sleep(1);
 	}
 
 	/* When you are done... */
@@ -96,73 +96,3 @@ int runGpsStreamClient() {
 	return EXIT_SUCCESS;
 }
 
-int runGpsCommanClient() {
-	int rc;
-	int count = 0;
-//	char *fmsg = "?WATCH={\"nmea\":true,\"pps\":true}\r\n";
-//	char *fmsg = "?WATCH={\"raw\":2,\"pps\":true}\r\n";
-//	char *fmsg = "?WATCH={\"nmea\":true,\"pps\":true,\"device\":\"/dev/serial0\"}\r\n";
-//	char *fmsg = "?WATCH={\"raw\":2,\"pps\":true,\"device\":\"/dev/serial0\"}\r\n";
-	char *fmsg = "?WATCH={\"enable\":true,\"pps\":true}\r\n";
-	struct gps_data_t gps_data;
-
-	if ((rc = gps_open("localhost", "2947", &gps_data)) == -1) {
-		printf("code: %d, reason: %s\n", rc, gps_errstr(rc));
-		return EXIT_FAILURE;
-	}
-
-	while (count < 60) {
-		printf("command GPS sensor: %s\n", fmsg);
-		if (gps_send(&gps_data, fmsg) == -1) {
-			(void) fprintf(stderr, "test_libgps: gps send error: %d, %s\n",
-			errno, gps_errstr(errno));
-		}
-		/* wait for 1 second to receive data */
-		if (gps_waiting(&gps_data, 1000000)) {
-			/* read data */
-			if ((rc = gps_read(&gps_data)) == -1) {
-				printf(
-						"error occurred reading gps data. code: %d, reason: %s\n",
-						rc, gps_errstr(rc));
-			} else {
-				/* Display data from the GPS receiver. */
-				double lat = gps_data.fix.latitude;
-				double lon = gps_data.fix.longitude;
-				double alt = gps_data.fix.altitude;
-				double speed = gps_data.fix.speed;
-				double climb = gps_data.fix.climb;
-				double t = gps_data.fix.time; // EDIT: Replaced tv.tv_sec with gps_data.fix.time
-				int status = gps_data.status;
-				int mode = gps_data.fix.mode;
-
-				printf("status: %d - ", status);
-				printf("mode: %d - ", mode);
-				printf("latitude: %f - ", lat);
-				printf("longitude: %f - ", lon);
-				printf("altitude: %f - ", alt);
-				printf("speed: %f - ", speed);
-				printf("vertical speed: %f - ", climb);
-				printf("timestamp: %f - ", t);
-				printf("%d:%d:%d", (int) (t / 3600), (int) (t / 60), (int) t);
-
-				if ((status == STATUS_FIX)
-						&& (mode == MODE_2D || mode == MODE_3D)
-						&& !isnan(lat) && !isnan(lon)) {
-					//gettimeofday(&tv, NULL); EDIT: tv.tv_sec isn't actually the timestamp!
-					printf(" =) GPS data correctly received\n");
-				} else {
-					printf(" =( NO GPS data received\n");
-				}
-			}
-		} else {
-			printf("Timeout to retrieve data from gpsd.");
-		}
-		count++;
-		sleep(1);
-	}
-
-	/* When you are done... */
-	gps_close(&gps_data);
-
-	return EXIT_SUCCESS;
-}

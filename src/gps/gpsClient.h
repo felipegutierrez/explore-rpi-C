@@ -10,7 +10,6 @@
 
 
 int runGpsStreamClient();
-int runGpsCommanClient();
 
 
 #endif /* GPS_GPSCLIENT_H_ */

@@ -15,7 +15,7 @@ Exploring Raspberry Pi using C/C++ programming language
 
 ## Execution
 
-Execute the command 'make' under the root directory and an executalbe file 'main' will be create at the 'bin' directory.
+Execute the command `make` under the root directory and an executalbe file `main` will be create at the `bin` directory.
 
 
 
