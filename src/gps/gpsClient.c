@@ -14,6 +14,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <math.h>
+#include <sys/time.h>
 
 #include "gpsClient.h"
 #include "../utils/metrics.h"
@@ -21,27 +22,34 @@
 int runGpsStreamClient() {
 	int rc;
 	int count = 0;
-	clock_t t;
-
+	clock_t cpu_t;
+	struct timeval user_t;
 	struct gps_data_t gps_data;
-	t = clock();
+
+	gettimeofday(&user_t, NULL);
+	cpu_t = clock();
 	if ((rc = gps_open("localhost", "2947", &gps_data)) == -1) {
 		printf("code: %d, reason: %s\n", rc, gps_errstr(rc));
 		return EXIT_FAILURE;
 	}
-	get_metric(t, "gps_open");
+	get_cpu_time(cpu_t, "gps_open");
+	get_user_time(user_t, "gps_open");
 
-	t = clock();
+	gettimeofday(&user_t, NULL);
+	cpu_t = clock();
 	gps_stream(&gps_data, WATCH_ENABLE | WATCH_JSON, NULL);
-	get_metric(t, "gps_stream");
+	get_cpu_time(cpu_t, "gps_stream");
+	get_user_time(user_t, "gps_stream");
 
 	while (count < 60) {
 		/* wait for 0.1 second to receive data */
 		if (gps_waiting(&gps_data, 100000)) {
 
-			t = clock();
+			gettimeofday(&user_t, NULL);
+			cpu_t = clock();
 			int rc = gps_read(&gps_data);
-			get_metric(t, "gps_read");
+			get_cpu_time(cpu_t, "gps_read");
+			get_user_time(user_t, "gps_read");
 
 			/* read data */
 			if (rc == -1) {
@@ -83,7 +91,9 @@ int runGpsStreamClient() {
 				}
 			}
 		} else {
-			printf("counter[%d]. Timeout to retrieve data from gpsd. Maybe increase gps_waiting.\n", count);
+			printf(
+					"counter[%d]. Timeout to retrieve data from gpsd. Maybe increase gps_waiting.\n",
+					count);
 		}
 		count++;
 		// sleep(1);
