@@ -9,8 +9,8 @@ Exploring Raspberry Pi using C/C++ programming language
 
 ## Requirements
 
-- gcc version 6.x.x
-- Make
+- gcc version 6.3.x or higher
+- GNU Make 4.1 or higher
 
 
 ## Execution

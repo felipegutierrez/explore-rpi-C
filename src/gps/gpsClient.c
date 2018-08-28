@@ -62,15 +62,16 @@ int runGpsStreamClient() {
 						"error occurred reading gps data. code: %d, reason: %s\n",
 						rc, gps_errstr(rc));
 			} else {
+
 				/* Display data from the GPS receiver. */
 				double lat = gps_data.fix.latitude;
 				double lon = gps_data.fix.longitude;
 				double alt = gps_data.fix.altitude;
 				double speed = gps_data.fix.speed;
 				double climb = gps_data.fix.climb;
-				time_t seconds = (time_t) gps_data.fix.time;
 				int status = gps_data.status;
 				int mode = gps_data.fix.mode;
+				time_t seconds = (time_t) gps_data.fix.time;
 
 				/**
 				 * MODE_NOT_SEEN	0	mode update not seen yet
@@ -78,21 +79,21 @@ int runGpsStreamClient() {
 				 * MODE_2D  		2	good for latitude/longitude
 				 * MODE_3D  		3	good for altitude/climb too
 				 */
-				printf("status[%d], ", status);
-				printf("mode[%d], ", mode);
-				printf("latitude[%f], ", lat);
-				printf("longitude[%f], ", lon);
-				printf("altitude[%f], ", alt);
-				printf("speed[%f], ", speed);
-				printf("v speed[%f], ", climb);
-				printf("Time[%s].", ctime(&seconds));
-
 				if ((status == STATUS_FIX)
 						&& (mode == MODE_2D || mode == MODE_3D)
 						&& !isnan(lat) && !isnan(lon)) {
-					printf(" GPS data OK.\n");
+					printf("GPS data OK - ");
+					printf("status[%d], ", status);
+					printf("mode[%d], ", mode);
+					printf("latitude[%f], ", lat);
+					printf("longitude[%f], ", lon);
+					printf("altitude[%f], ", alt);
+					printf("speed[%f], ", speed);
+					printf("v speed[%f]\n", climb);
+					print_current_time();
+					print_time(seconds);
 				} else {
-					printf(" GPS data NOK.\n");
+					printf("GPS data NOK.\n");
 				}
 			}
 		} else {
