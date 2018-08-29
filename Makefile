@@ -11,7 +11,7 @@ all: clean compile
 
 compile:
 	mkdir $(TARGET)
-	$(CC) $(SRC)/main.c $(SRC)/multithread/testMultiThread.c $(SRC)/gps/gpsClient.c $(SRC)/utils/metrics.c $(CCFLAGS) -o $(TARGET)/main
+	$(CC) $(SRC)/main.c $(SRC)/multithread/testMultiThread.c $(SRC)/gps/gpsClient.c $(SRC)/serial/read_serial.c $(SRC)/utils/metrics.c $(CCFLAGS) -o $(TARGET)/main
 
 clean:
 	rm -Rf $(TARGET)

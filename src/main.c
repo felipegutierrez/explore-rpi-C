@@ -14,6 +14,7 @@
 #include "main.h"
 #include "multithread/testMultiThread.h"
 #include "gps/gpsClient.h"
+#include "serial/read_serial.h"
 
 int main(int argv, char** argc) {
 
@@ -38,6 +39,11 @@ int main(int argv, char** argc) {
 			runGpsStreamClient();
 			choice = 0;
 			break;
+		case 3:
+			printf("\n");
+			read_serial();
+			choice = 0;
+			break;
 		default:
 			printf("Option not valid. Please try again.\n");
 		}
@@ -52,5 +58,6 @@ void menu() {
 	printf(" 0  - Exit\n");
 	printf(" 1  - MultiThread test\n");
 	printf(" 2  - Gps stream test\n");
+	printf(" 3  - Read from UART port\n");
 	printf("Please choose your application: ");
 }
