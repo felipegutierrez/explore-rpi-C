@@ -22,39 +22,35 @@
 int runGpsStreamClient() {
 	int rc;
 	int count = 0;
-	clock_t cpu_t;
-	struct timeval user_t;
+	clock_t cpu_start;
+	struct timeval user_start;
 	struct gps_data_t gps_data;
 
-	gettimeofday(&user_t, NULL);
-	cpu_t = clock();
+	gettimeofday(&user_start, NULL);
+	cpu_start = clock();
 	if ((rc = gps_open("localhost", "2947", &gps_data)) == -1) {
 		printf("code: %d, reason: %s\n", rc, gps_errstr(rc));
 		return EXIT_FAILURE;
 	}
-	get_cpu_time(cpu_t, "gps_open");
-	get_user_time(user_t, "gps_open");
+	get_cpu_and_user_time(cpu_start, user_start, "gps_open");
 
-	gettimeofday(&user_t, NULL);
-	cpu_t = clock();
+	gettimeofday(&user_start, NULL);
+	cpu_start = clock();
 	gps_stream(&gps_data, WATCH_ENABLE | WATCH_JSON, NULL);
-	get_cpu_time(cpu_t, "gps_stream");
-	get_user_time(user_t, "gps_stream");
+	get_cpu_and_user_time(cpu_start, user_start, "gps_stream");
 
 	while (count < 60) {
 
-		gettimeofday(&user_t, NULL);
-		cpu_t = clock();
+		gettimeofday(&user_start, NULL);
+		cpu_start = clock();
 		/* wait for 2 second to receive data */
 		if (gps_waiting(&gps_data, 20000000)) {
-			get_cpu_time(cpu_t, "gps_waiting");
-			get_user_time(user_t, "gps_waiting");
+			get_cpu_and_user_time(cpu_start, user_start, "gps_waiting");
 
-			gettimeofday(&user_t, NULL);
-			cpu_t = clock();
+			gettimeofday(&user_start, NULL);
+			cpu_start = clock();
 			int rc = gps_read(&gps_data);
-			get_cpu_time(cpu_t, "gps_read");
-			get_user_time(user_t, "gps_read");
+			get_cpu_and_user_time(cpu_start, user_start, "gps_read");
 
 			/* read data */
 			if (rc == -1) {
@@ -90,15 +86,15 @@ int runGpsStreamClient() {
 					printf("altitude[%f], ", alt);
 					printf("speed[%f], ", speed);
 					printf("v speed[%f]\n", climb);
-					print_current_time();
 					print_time(seconds);
+					print_current_time();
+					printf("\n");
 				} else {
 					printf("GPS data NOK.\n");
 				}
 			}
 		} else {
-			get_cpu_time(cpu_t, "gps_waiting");
-			get_user_time(user_t, "gps_waiting");
+			get_cpu_and_user_time(cpu_start, user_start, "gps_waiting");
 			printf(
 					"counter[%d]. Timeout to retrieve data from gpsd. Maybe increase gps_waiting.\n",
 					count);

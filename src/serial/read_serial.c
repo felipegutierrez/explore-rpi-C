@@ -49,13 +49,15 @@ int read_serial() {
 	tcsetattr(sfd, TCSANOW, &options);
 
 	// Attempt to write data
-	char buf[] = "hello world";
+	char buf[] = "?VERSION;";
 	printf("Sending: %s\n", buf);
 	int wcount = write(sfd, buf, strlen(buf));
-	usleep(100000);
+	usleep(1000000);
 
 	if (wcount < 0) {
 		perror("Write");
+		close(sfd);
+		printf("Successfully closed port /dev/serial0\n");
 		return EXIT_FAILURE;
 	} else {
 		printf("Sent %d characters\n", wcount);
@@ -69,6 +71,8 @@ int read_serial() {
 	int rcount = read(sfd, buf2, sizeof(buf2));
 	if (rcount < 0) {
 		perror("Read");
+		close(sfd);
+		printf("Successfully closed port /dev/serial0\n");
 		return EXIT_FAILURE;
 	} else {
 		printf("Received %d characters\n", rcount);
