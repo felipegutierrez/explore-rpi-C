@@ -1,8 +1,14 @@
 
 CC=gcc
-CCFLAGS= -Wall -Wcomment -lm -lgps -lpthread
+CCFLAGS= -Wall -Wcomment -lm -lgps -lpthread -lwiringPi
 TARGET=bin
 SRC=src
+
+MULTITHREAD=$(SRC)/multithread/testMultiThread.c
+GPS=$(SRC)/gps/gpsClient.c
+READSERIAL=$(SRC)/serial/read_serial.c
+METRICS=$(SRC)/utils/metrics.c
+ULTRASONIC=$(SRC)/ultrasonic/ultrasonicClient.c
 
 all: clean compile
 
@@ -11,7 +17,7 @@ all: clean compile
 
 compile:
 	mkdir $(TARGET)
-	$(CC) $(SRC)/main.c $(SRC)/multithread/testMultiThread.c $(SRC)/gps/gpsClient.c $(SRC)/serial/read_serial.c $(SRC)/utils/metrics.c $(CCFLAGS) -o $(TARGET)/main
+	$(CC) $(SRC)/main.c $(MULTITHREAD) $(GPS) $(READSERIAL) $(METRICS) $(ULTRASONIC) $(CCFLAGS) -o $(TARGET)/main
 
 clean:
 	rm -Rf $(TARGET)
