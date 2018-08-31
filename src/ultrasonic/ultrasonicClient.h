@@ -8,6 +8,7 @@
 #ifndef ULTRASONIC_ULTRASONICCLIENT_H_
 #define ULTRASONIC_ULTRASONICCLIENT_H_
 
+void recordPulseLength();
 void setupUltrasonic();
 int getCM();
 int runUltrasonicClient();
