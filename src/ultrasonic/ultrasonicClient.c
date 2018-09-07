@@ -11,15 +11,15 @@
 
 #include "ultrasonicClient.h"
 
-#define TRUE 1
+#define TRUE (1==1)
 
 // HC-SR04 ultrasonic sensor with 1 KΩ resisto and 2 KΩ resisto
 // #define TRIG 5
 // #define ECHO 6
 
 // HC-SR04 ultrasonic sensor on AlphaBot2 Pi Zero
-#define TRIG 22
-#define ECHO 27
+#define TRIG 15
+#define ECHO 13
 
 static volatile long startTimeUsec;
 static volatile long endTimeUsec;
@@ -57,30 +57,30 @@ int getCM() {
 	// The sensor will raise the echo pin high for the length of time that it took
 	// the ultrasonic bursts to travel round trip.
 	while (digitalRead(ECHO) == LOW && micros() - now < 30000);
-		recordPulseLength();
+	recordPulseLength();
 
-	long travelTimeUsec = endTimeUsec - startTimeUsec;
-	double distanceMeters = 100 * ((travelTimeUsec / 1000000.0) * 340.29) / 2;
+	//  long travelTimeUsec = endTimeUsec - startTimeUsec;
+	// double distanceMeters = 100 * ((travelTimeUsec / 1000000.0) * 340.29) / 2;
 
-//	//Wait for echo end
-//	long startTime = micros();
-//	while (digitalRead(ECHO) == HIGH)
-//		;
-//	long travelTime = micros() - startTime;
-//
-//	//Get distance in cm
-//	int distance = travelTime * 34000 / 2;
+	//Wait for echo end
+	long startTime = micros();
+	while (digitalRead(ECHO) == HIGH);
+	long travelTime = micros() - startTime;
 
-	return distanceMeters * 100;
+	//Get distance in cm
+	int distance = travelTime * 34000 / 2;
+
+	return distance * 100;
 }
 
 int runUltrasonicClient() {
 	int count = 0;
 	setupUltrasonic();
 
-	while (count < 60) {
+	while (count < 10) {
 		printf("Distance: %dcm\n", getCM());
 		count++;
+		delay(500); // 0.5 second
 	}
 	return 0;
 }

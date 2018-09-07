@@ -5,57 +5,106 @@
  *      Author: felipe
  */
 
-// # include <bcm2835.h>
-# include <stdio.h>
-# include <time.h>
-# include <stdlib.h>
+#include <bcm2835.h>
+#include <stdio.h>
 
 #include "ultrasonicBCM2835.h"
 
-//# define ECHO RPI_V2_GPIO_P1_03
-//# define TRIG RPI_V2_GPIO_P1_05
+#define trig RPI_V2_GPIO_P1_15
+#define echo RPI_V2_GPIO_P1_13
 
-int runUltrasonicBCM2835() {
+#define __STDC_FORMAT_MACROS
+
+int run_HC_SR04_BCM2835() {
+	int count = 1;
+	int max = 0;
+
+	printf("How many iterations do you want to scan [int]: ");
+	scanf("%d", &max);
+	while (count <= max) {
+		printf("Iteration[%d of %d]\n", count, max);
+
+		float preInt = preciseDistanceInches(trig, echo);
+		float preCent = preciseDistanceCentimeters(trig, echo);
+
+		printf("Inches[%f] - ", preInt);
+		printf("Centimeters[%f]\n\n", preCent);
+		count++;
+		delay(1000);
+	}
+	return 0;
+}
+
+/*
+ *  This is a local subroutine function used in each method to
+ *  initiate pulses out of the sensor and return the pulse with
+ *  of the returned ultrasonic signal.
+ *  Trigger - The GPIO pin attached to the trigger pin on the
+ *            sensor.
+ *  Echo    - The GPIO pin attached to the echo pin on the
+ *            sensor.
+ */
+static uint64_t cyclePulse(int trigger, int echo) {
 	if (!bcm2835_init())
 		return 1;
 
-//	bcm2835_gpio_fsel(ECHO, BCM2835_GPIO_FSEL_INPT);
-//	bcm2835_gpio_fsel(TRIG, BCM2835_GPIO_FSEL_OUTP);
-//
-//	time_t clockstart = 0;
-//	time_t clockstop = 0;
-//
-//	bcm2835_gpio_write(ECHO, LOW);
-//	delay(2);
-//
-//	printf("trigger\n");
-//
-//	bcm2835_gpio_write(TRIG, HIGH);
-//	usleep(10);
-//	bcm2835_gpio_write(TRIG, LOW);
-//
-//	printf("measure\n");
-//
-//	while (bcm2835_gpio_lev(ECHO) == 0) {
-//		clockstart = time(NULL);
-//	}
-//
-//	printf("B: %i\n", (int) clockstart);
-//
-//	while (bcm2835_gpio_lev(ECHO) == 1) {
-//		clockstop = time(NULL);
-//	}
-//
-//	printf("E: %i\n", (int) clockstop);
-//
-//	time_t delta = clockstop - clockstart;
-//
-//	printf("D: %i\n", delta);
-//
-//	double distance = (delta * 340) / 2;
-//
-//	printf("DISTANCE: %i\n", distance);
-//
-//	bcm2835_close();
-	return 0;
+	// Set RPi pin echo to be an input pin
+	bcm2835_gpio_fsel(echo, BCM2835_GPIO_FSEL_INPT);
+	// Set RPi pin P1-11 to be an output pin
+	bcm2835_gpio_fsel(trigger, BCM2835_GPIO_FSEL_OUTP);
+
+	// Declare the unsigned int timer variables to measure pulses
+	uint64_t width, begin, start, end;
+	int max = 80, check;
+
+	begin = bcm2835_st_read();
+
+	// Emit pulse for 10 microseconds
+	bcm2835_gpio_write(trigger, HIGH); // Set trigger state HIGH
+	bcm2835_delayMicroseconds(10);  // Wait 10 microseconds
+	bcm2835_gpio_write(trigger, LOW);  // Set trigger state LOW
+
+	// Infinite loop until a pulse is received
+	while (bcm2835_gpio_lev(echo) == LOW && check < max) {
+		start = bcm2835_st_read();
+		check = (int) begin - start;
+	}
+
+	// Loop and delay for one microsecond until falling edge detected
+	while (bcm2835_gpio_lev(echo) == HIGH) {
+		bcm2835_delayMicroseconds(1);
+	}
+	// Record the ending time of the pulse to get the pulse width
+	end = bcm2835_st_read();
+
+	// Get the final with of the pulse
+	width = end - start;
+
+	//Close the bcm2835 bridge
+	bcm2835_close();
+
+	// Return the total width of the returned pulse
+	return width;
+}
+
+/*
+ * Returns a 6 decimal place precise value of the
+ * distance in inches from the distance sensor.
+ *
+ * Trigger - The GPIO pin attached to the trigger pin on the sensor.
+ * Echo    - The GPIO pin attached to the echo pin on the sensor.
+ */
+float preciseDistanceInches(int trigger, int echo) {
+	return (float) cyclePulse(trigger, echo) / 144;
+}
+
+/*
+ * Returns a 6 decimal place precise value of the
+ * distance in centimeters from the distance sensor.
+ *
+ * Trigger - The GPIO pin attached to the trigger pin on the sensor.
+ * Echo    - The GPIO pin attached to the echo pin on the sensor.
+ */
+float preciseDistanceCentimeters(int trigger, int echo) {
+	return (float) cyclePulse(trigger, echo) / 55.5;
 }

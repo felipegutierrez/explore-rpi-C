@@ -16,6 +16,8 @@
 #include "gps/gpsClient.h"
 #include "serial/read_serial.h"
 #include "ultrasonic/ultrasonicClient.h"
+#include "ultrasonic/ultrasonicBCM2835.h"
+#include "gpio/readall.h"
 
 int main(int argv, char** argc) {
 
@@ -47,7 +49,17 @@ int main(int argv, char** argc) {
 			break;
 		case 4:
 			printf("\n");
+			run_HC_SR04_BCM2835();
+			choice = 0;
+			break;
+		case 5:
+			printf("\n");
 			read_serial();
+			choice = 0;
+			break;
+		case 6:
+			printf("\n");
+			read_all_gpio();
 			choice = 0;
 			break;
 		default:
@@ -61,10 +73,12 @@ int main(int argv, char** argc) {
 }
 
 void menu() {
-	printf(" 0  - Exit\n");
-	printf(" 1  - MultiThread test\n");
-	printf(" 2  - Gps stream test on UART port\n");
-	printf(" 3  - Ultrasonic client on ... port\n");
-	printf(" 4  - Read from UART port\n");
+	printf(" 0 - Exit\n");
+	printf(" 1 - MultiThread test\n");
+	printf(" 2 - Gps stream test on UART port\n");
+	printf(" 3 - HC-SR04 Ultrasonic client on ... using wiringPi\n");
+	printf(" 4 - HC-SR04 Ultrasonic client on ... using BCM2835\n");
+	printf(" 5 - Read from UART port\n");
+	printf(" 6 - Read from GPIO port\n");
 	printf("Please choose your application: ");
 }

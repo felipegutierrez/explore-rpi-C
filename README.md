@@ -5,7 +5,8 @@ Exploring Raspberry Pi using C/C++ programming language
 ## Items
 
 - multithread test
-- gps client for Raspberry Pi based on the [gpsd](http://www.catb.org/gpsd/client-howto.html)
+- gps client based on the [gpsd](http://www.catb.org/gpsd/client-howto.html)
+- HC-SR04 Ultrasonic Sensor
 
 ## Requirements
 
@@ -20,6 +21,7 @@ Depending of which client you want to test it is necessary to install the specif
 
 - [gpsd](http://www.catb.org/gpsd/client-howto.html) lib `sudo apt-get install libgps-dev`
 - [wiringPi](http://wiringpi.com/download-and-install/) lib
+- [bcm2835](https://www.airspayce.com/mikem/bcm2835/)`wget http://www.airspayce.com/mikem/bcm2835/bcm2835-1.56.tar.gz` `tar xvfz bcm2835-1.56.tar.gz` `cd bcm2835-1.56/` `./configure` `make` `sudo make install`
 
 ## Execution
 
