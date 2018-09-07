@@ -7,8 +7,17 @@
 
 #include <bcm2835.h>
 #include <stdio.h>
+#include <time.h>
+#include <math.h>
+#include <sys/time.h>
 
 #include "ultrasonicBCM2835.h"
+#include "../utils/metrics.h"
+
+/*
+ * The pins here are defined when we use the HC-SR04 sensor connected to a AlphaBot2 with Raspberry Pi Zero.
+ * If you connect the HC-SR04 sensor directly to a Raspberry Pi with resistors the pins might change.
+ */
 
 #define trig RPI_V2_GPIO_P1_15
 #define echo RPI_V2_GPIO_P1_13
@@ -16,6 +25,8 @@
 #define __STDC_FORMAT_MACROS
 
 int run_HC_SR04_BCM2835() {
+	clock_t cpu_start;
+	// struct timeval user_start;
 	int count = 1;
 	int max = 0;
 
@@ -24,10 +35,15 @@ int run_HC_SR04_BCM2835() {
 	while (count <= max) {
 		printf("Iteration[%d of %d]\n", count, max);
 
-		float preInt = preciseDistanceInches(trig, echo);
-		float preCent = preciseDistanceCentimeters(trig, echo);
+		// gettimeofday(&user_start, NULL);
+		// get_cpu_and_user_time(cpu_start, user_start, "preciseDistanceInches");
 
-		printf("Inches[%f] - ", preInt);
+		cpu_start = clock();
+		// float preInt = preciseDistanceInches(trig, echo); // if we measure the time between inches and centimeter functions the metric gets wrong
+		float preCent = preciseDistanceCentimeters(trig, echo);
+		get_cpu_time(cpu_start, "preciseDistance");
+
+		// printf("Inches[%f] - ", preInt);
 		printf("Centimeters[%f]\n\n", preCent);
 		count++;
 		delay(1000);
